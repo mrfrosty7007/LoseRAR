@@ -65,6 +65,56 @@ impl eframe::App for LoserArApp {
         crate::ui::dialogs::compress::render(self, ctx);
         crate::ui::dialogs::extract::render(self, ctx);
 
+        // Draw visual highlight when dragging over the window
+        if !ctx.input(|i| i.raw.hovered_files.is_empty()) {
+            let screen_rect = ctx.screen_rect();
+            egui::Area::new(egui::Id::new("drag_drop_overlay"))
+                .fixed_pos(screen_rect.min)
+                .order(egui::Order::Foreground)
+                .interactable(false)
+                .show(ctx, |ui| {
+                    // Draw semi-transparent dark background
+                    let painter = ui.painter();
+                    painter.rect_filled(
+                        screen_rect,
+                        10.0, // Match window rounding
+                        egui::Color32::from_rgba_unmultiplied(20, 20, 24, 210), // Sleek, modern dark glassmorphism
+                    );
+
+                    // Draw a dashed glowing accent border
+                    let stroke_color = egui::Color32::from_rgb(88, 101, 242); // Theme's accent blurple
+                    let stroke = egui::Stroke::new(2.5, stroke_color);
+                    painter.rect_stroke(
+                        screen_rect.shrink(24.0),
+                        10.0,
+                        stroke,
+                    );
+
+                    // Centered feedback content
+                    ui.allocate_ui_at_rect(screen_rect.shrink(32.0), |ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.add_space(screen_rect.height() / 2.0 - 100.0);
+
+                            ui.label(egui::RichText::new("📥").size(64.0));
+                            ui.add_space(16.0);
+
+                            ui.label(
+                                egui::RichText::new("Drop Files or Folders")
+                                    .color(egui::Color32::WHITE)
+                                    .size(24.0)
+                                    .strong(),
+                            );
+                            ui.add_space(8.0);
+                            ui.label(
+                                egui::RichText::new("to automatically view and select them in LoseRAR")
+                                    .color(egui::Color32::from_rgb(170, 170, 180))
+                                    .size(14.0),
+                            );
+                        });
+                    });
+                });
+        }
+
         // Handle drag and drop
         if !ctx.input(|i| i.raw.dropped_files.is_empty()) {
             let dropped_files = ctx.input(|i| i.raw.dropped_files.clone());
@@ -75,8 +125,16 @@ impl eframe::App for LoserArApp {
                 }
             }
             if !paths.is_empty() {
+                // Determine the parent folder of the first dropped path to navigate to it
+                if let Some(parent) = paths[0].parent() {
+                    self.current_path = parent.to_path_buf();
+                    self.refresh_dir();
+                } else {
+                    // Fallback to the path itself if it has no parent (e.g. it is a root drive)
+                    self.current_path = paths[0].clone();
+                    self.refresh_dir();
+                }
                 self.selected_paths = paths;
-                self.show_compress_dialog = true;
             }
         }
     }

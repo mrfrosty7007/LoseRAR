@@ -1,4 +1,4 @@
-# LoserAR
+# LoserRAR
 
 A modern, open-source alternative to WinRAR, built in Rust with `egui`.
 

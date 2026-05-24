@@ -17,7 +17,7 @@ fn main() -> eframe::Result<()> {
     };
 
     eframe::run_native(
-        "LoserAR - Modern Archive Manager",
+        "LoseRAR - Modern Archive Manager",
         options,
         Box::new(|cc| {
             // Apply custom dark theme

@@ -35,7 +35,8 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
                         let icon = if entry.is_dir { "📁" } else { "📄" };
                         
                         row.col(|ui| {
-                            if ui.selectable_label(is_selected, format!("{} {}", icon, entry.name)).clicked() {
+                            let response = ui.selectable_label(is_selected, format!("{} {}", icon, entry.name));
+                            if response.clicked() {
                                 if ui.input(|i| i.modifiers.ctrl) {
                                     if is_selected {
                                         app.selected_paths.retain(|p| p != &entry.path);
@@ -46,7 +47,7 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
                                     app.selected_paths = vec![entry.path.clone()];
                                 }
                             }
-                            if ui.input(|i| i.pointer.double_clicked()) && ui.rect_contains_pointer(ui.max_rect()) {
+                            if response.double_clicked() {
                                 if entry.is_dir {
                                     navigate_to = Some(entry.path.clone());
                                 } else if entry.name.ends_with(".zip") {

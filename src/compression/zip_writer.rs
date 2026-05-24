@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
-use zip::write::SimpleFileOptions;
+use zip::write::FileOptions;
 use zip::CompressionMethod;
 
 pub fn compress_paths(
@@ -48,7 +48,7 @@ pub fn compress_paths(
     // 2. Create archive
     let file = File::create(&dest_archive).context("Failed to create archive file")?;
     let mut zip = zip::ZipWriter::new(file);
-    let options = SimpleFileOptions::default()
+    let options = FileOptions::default()
         .compression_method(CompressionMethod::Deflated)
         .compression_level(Some(level))
         .unix_permissions(0o755);

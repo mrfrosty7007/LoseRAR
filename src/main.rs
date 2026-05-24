@@ -23,7 +23,7 @@ fn main() -> eframe::Result<()> {
             // Apply custom dark theme
             ui::theme::setup_custom_fonts(&cc.egui_ctx);
             ui::theme::setup_dark_theme(&cc.egui_ctx);
-            Ok(Box::new(LoserArApp::new(cc)))
+            Box::new(LoserArApp::new(cc))
         }),
     )
 }

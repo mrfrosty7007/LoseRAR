@@ -125,7 +125,8 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                                 let cancel_btn = egui::Button::new(
                                     egui::RichText::new("Cancel").color(egui::Color32::WHITE)
-                                ).fill(egui::Color32::from_rgb(180, 40, 40));
+                                )
+                                .fill(egui::Color32::from_rgb(130, 45, 45));
 
                                 if ui.add(cancel_btn).clicked() {
                                     progress.cancel();

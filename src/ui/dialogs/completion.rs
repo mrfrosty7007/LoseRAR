@@ -79,8 +79,9 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
                                         ui.end_row();
 
                                         if !is_extraction {
-                                            let ratio = if original_size > 0 {
-                                                compressed_size as f64 / original_size as f64
+                                            let space_saved_percent = if original_size > 0 {
+                                                let compressed_pct = (compressed_size as f64 / original_size as f64) * 100.0;
+                                                (100.0 - compressed_pct).max(0.0)
                                             } else {
                                                 0.0
                                             };
@@ -95,8 +96,8 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
                                             ui.label(RichText::new(format!("{:.1} MB", compressed_mb)).strong().color(Color32::WHITE));
                                             ui.end_row();
 
-                                            ui.label(RichText::new("Compression Ratio:").color(Color32::from_rgb(150, 150, 160)));
-                                            ui.label(RichText::new(format!("{:.0}%", ratio * 100.0)).strong().color(Color32::from_rgb(100, 200, 255)));
+                                            ui.label(RichText::new("Space Saved:").color(Color32::from_rgb(150, 150, 160)));
+                                            ui.label(RichText::new(format!("{:.1}%", space_saved_percent)).strong().color(Color32::from_rgb(100, 200, 255)));
                                             ui.end_row();
                                         }
 

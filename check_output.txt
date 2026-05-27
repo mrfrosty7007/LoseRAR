@@ -1,0 +1,109 @@
+   Compiling loserar v0.1.0 (C:\Users\mahad\OneDrive\Documents\Project1(WInrar)\loserar)
+warning: unused import: `entry::ArchiveEntry`
+ --> src\archive\mod.rs:3:9
+  |
+3 | pub use entry::ArchiveEntry;
+  |         ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Path`
+ --> src\compression\zip_writer.rs:5:17
+  |
+5 | use std::path::{Path, PathBuf};
+  |                 ^^^^
+
+warning: unused import: `Path`
+ --> src\extraction\zip_reader.rs:6:17
+  |
+6 | use std::path::{Path, PathBuf};
+  |                 ^^^^
+
+warning: unused import: `TimeZone`
+ --> src\fs\browser.rs:2:31
+  |
+2 | use chrono::{DateTime, Local, TimeZone};
+  |                               ^^^^^^^^
+
+warning: unused import: `std::path::PathBuf`
+ --> src\ui\dialogs\compress.rs:4:5
+  |
+4 | use std::path::PathBuf;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Color32` and `ScrollArea`
+ --> src\ui\panels\file_list.rs:1:45
+  |
+1 | use egui::{Context, CentralPanel, RichText, ScrollArea, Color32};
+  |                                             ^^^^^^^^^^  ^^^^^^^
+
+warning: unused import: `RichText`
+ --> src\ui\panels\sidebar.rs:1:32
+  |
+1 | use egui::{Context, SidePanel, RichText, ScrollArea};
+  |                                ^^^^^^^^
+
+warning: unused import: `std::path::PathBuf`
+ --> src\ui\panels\sidebar.rs:3:5
+  |
+3 | use std::path::PathBuf;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `FontFamily` and `FontId`
+ --> src\ui\theme.rs:1:30
+  |
+1 | use egui::{Color32, Context, FontFamily, FontId, Stroke, Style, Visuals, Rounding};
+  |                              ^^^^^^^^^^  ^^^^^^
+
+warning: variable does not need to be mutable
+ --> src\ui\theme.rs:4:9
+  |
+4 |     let mut fonts = egui::FontDefinitions::default();
+  |         ----^^^^^
+  |         |
+  |         help: remove this `mut`
+  |
+  = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `text_dim`
+  --> src\ui\theme.rs:28:9
+   |
+28 |     let text_dim = Color32::from_rgb(150, 150, 150);
+   |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_text_dim`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `ArchiveEntry` is never constructed
+ --> src\archive\entry.rs:4:12
+  |
+4 | pub struct ArchiveEntry {
+  |            ^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `files_processed` and `total_files` are never read
+  --> src\compression\progress.rs:11:9
+   |
+ 9 |     Working {
+   |     ------- fields in this variant
+10 |         current_file: String,
+11 |         files_processed: usize,
+   |         ^^^^^^^^^^^^^^^
+12 |         total_files: usize,
+   |         ^^^^^^^^^^^
+   |
+   = note: `ProgressState` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: field `archive_name` is never read
+  --> src\compression\progress.rs:21:9
+   |
+18 |     Finished {
+   |     -------- field in this variant
+...
+21 |         archive_name: String,
+   |         ^^^^^^^^^^^^
+   |
+   = note: `ProgressState` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: `loserar` (bin "LoseRAR") generated 14 warnings (run `cargo fix --bin "LoseRAR" -p loserar` to apply 11 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.86s

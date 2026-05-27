@@ -51,10 +51,13 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
                 }
                 
                 if ui.button("Cancel").clicked() {
+                    if let Some(progress) = &app.active_progress {
+                        progress.cancel();
+                    }
                     app.show_compress_dialog = false;
                 }
             });
         });
         
-    app.show_compress_dialog = open;
+    app.show_compress_dialog = app.show_compress_dialog && open;
 }

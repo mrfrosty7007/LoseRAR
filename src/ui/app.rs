@@ -64,6 +64,7 @@ impl eframe::App for LoserArApp {
 
         crate::ui::dialogs::compress::render(self, ctx);
         crate::ui::dialogs::extract::render(self, ctx);
+        crate::ui::dialogs::completion::render(self, ctx);
 
         // Draw visual highlight when dragging over the window
         if !ctx.input(|i| i.raw.hovered_files.is_empty()) {

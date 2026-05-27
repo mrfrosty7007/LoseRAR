@@ -54,9 +54,16 @@ pub fn compress_paths(
         .unix_permissions(0o755);
 
     let mut files_processed = 0;
+    let start_time =
+    std::time::Instant::now();
     let mut bytes_processed = 0;
 
     for (src_path, archive_name) in files_to_compress {
+        if progress.is_cancelled() {
+            progress.set_state(ProgressState::Error("Compression cancelled.".to_string()));
+            return Ok(());
+        }
+
         let name_str = archive_name.to_string_lossy().replace("\\", "/");
         
         progress.set_state(ProgressState::Working {
@@ -65,6 +72,7 @@ pub fn compress_paths(
             total_files,
             bytes_processed,
             total_bytes,
+            start_time,
         });
 
         if src_path.is_file() {
@@ -72,6 +80,11 @@ pub fn compress_paths(
             let mut f = File::open(&src_path)?;
             let mut buffer = [0; 65536]; // 64KB chunks
             loop {
+                if progress.is_cancelled() {
+                    progress.set_state(ProgressState::Error("Compression cancelled.".to_string()));
+                    return Ok(());
+                }
+
                 let count = f.read(&mut buffer)?;
                 if count == 0 {
                     break;
@@ -79,14 +92,18 @@ pub fn compress_paths(
                 zip.write_all(&buffer[..count])?;
                 bytes_processed += count as u64;
                 
-                // Update progress occasionally
-                progress.set_state(ProgressState::Working {
-                    current_file: name_str.clone(),
-                    files_processed,
-                    total_files,
-                    bytes_processed,
-                    total_bytes,
-                });
+// Update progress every 4 MB
+if bytes_processed % (4 * 1024 * 1024) < count as u64 {
+
+    progress.set_state(ProgressState::Working {
+        current_file: name_str.clone(),
+        files_processed,
+        total_files,
+        bytes_processed,
+        total_bytes,
+        start_time,
+    });
+}
             }
         } else if src_path.is_dir() && !name_str.is_empty() {
             zip.add_directory(&name_str, options)?;
@@ -95,12 +112,36 @@ pub fn compress_paths(
         files_processed += 1;
     }
 
-    zip.finish()?;
+zip.finish()?;
 
-    progress.set_state(ProgressState::Finished {
-        success: true,
-        message: format!("Successfully created archive with {} files.", files_processed),
-    });
+// Calculate statistics
+let duration_secs =
+    start_time.elapsed().as_secs_f64();
+
+let compressed_size =
+    std::fs::metadata(&dest_archive)?
+        .len();
+progress.set_state(ProgressState::Finished {
+    success: true,
+
+    archive_name: dest_archive
+        .file_name()
+        .unwrap()
+        .to_string_lossy()
+        .to_string(),
+
+    file_count: files_processed,
+
+    original_size: total_bytes,
+    compressed_size,
+
+    duration_secs,
+
+    message: format!(
+        "Successfully created archive with {} files.",
+        files_processed
+    ),
+});
 
     Ok(())
 }

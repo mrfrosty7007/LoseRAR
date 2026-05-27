@@ -33,6 +33,7 @@ pub fn extract_archive(
 
     let mut files_processed = 0;
     let mut bytes_processed = 0;
+    let start_time = std::time::Instant::now();
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i)?;
@@ -49,6 +50,7 @@ pub fn extract_archive(
             total_files,
             bytes_processed,
             total_bytes,
+            start_time,
         });
 
         if file.name().ends_with('/') {
@@ -64,6 +66,11 @@ pub fn extract_archive(
             // Chunked copying for progress reporting
             let mut buffer = [0; 65536];
             loop {
+                if progress.is_cancelled() {
+                    progress.set_state(ProgressState::Error("Extraction cancelled.".to_string()));
+                    return Ok(());
+                }
+
                 let count = io::Read::read(&mut file, &mut buffer)?;
                 if count == 0 {
                     break;
@@ -71,13 +78,16 @@ pub fn extract_archive(
                 io::Write::write_all(&mut outfile, &buffer[..count])?;
                 bytes_processed += count as u64;
 
-                progress.set_state(ProgressState::Working {
-                    current_file: file_name_str.clone(),
-                    files_processed,
-                    total_files,
-                    bytes_processed,
-                    total_bytes,
-                });
+                if bytes_processed % (4 * 1024 * 1024) < count as u64 {
+                    progress.set_state(ProgressState::Working {
+                        current_file: file_name_str.clone(),
+                        files_processed,
+                        total_files,
+                        bytes_processed,
+                        total_bytes,
+                        start_time,
+                    });
+                }
             }
         }
         
@@ -93,10 +103,27 @@ pub fn extract_archive(
         files_processed += 1;
     }
 
-    progress.set_state(ProgressState::Finished {
-        success: true,
-        message: format!("Successfully extracted {} files.", files_processed),
-    });
+progress.set_state(ProgressState::Finished {
+    success: true,
+
+    archive_name: archive_path
+        .file_name()
+        .unwrap()
+        .to_string_lossy()
+        .to_string(),
+
+    file_count: files_processed,
+
+    original_size: 0,
+    compressed_size: 0,
+
+    duration_secs: start_time.elapsed().as_secs_f64(),
+
+    message: format!(
+        "Successfully extracted {} files.",
+        files_processed
+    ),
+});
 
     Ok(())
 }

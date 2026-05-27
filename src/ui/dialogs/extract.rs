@@ -19,7 +19,7 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
             ui.label(format!("Extracting: {}", archive_path.file_name().unwrap_or_default().to_string_lossy()));
             ui.add_space(8.0);
             
-            let mut extract_dir = archive_path.parent().unwrap_or(&app.current_path).to_path_buf();
+            let extract_dir = archive_path.parent().unwrap_or(&app.current_path).to_path_buf();
             let mut extract_dir_str = extract_dir.to_string_lossy().to_string();
             
             ui.horizontal(|ui| {
@@ -51,10 +51,13 @@ pub fn render(app: &mut LoserArApp, ctx: &Context) {
                 }
                 
                 if ui.button("Cancel").clicked() {
+                    if let Some(progress) = &app.active_progress {
+                        progress.cancel();
+                    }
                     app.show_extract_dialog = false;
                 }
             });
         });
         
-    app.show_extract_dialog = open;
+    app.show_extract_dialog = app.show_extract_dialog && open;
 }
